@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 Model m=new Model();
                 m.setTitle("Dynamically created");
                 m.setDescription("This is created upon button press");
+                m.setId(1);
                 m.setImg(R.drawable.ic_launcher_background);
                 models.add(m);
                 //mRecyclerView.setAdapter(myAdapter);
@@ -135,7 +136,11 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject content = jsonArray1.getJSONObject(i);
                         String contentString = content.getString("content");
                         m.setTitle(contentString);
+                        int idVal = content.getInt("id");
+                        m.setId(idVal);
+                        m.setImg(R.drawable.ic_launcher_background);
                         m.setDescription("This is created upon button press");
+
                         m.setImg(R.drawable.ic_launcher_background);
                         m.setTitle(contentString);
                         incomingModels.add(m);
