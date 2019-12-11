@@ -55,7 +55,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
             public void onItemClickListener(View v, int position) {
                 //delete from database via ID
                 int id=models.get(position).getId();
-                //deleteModel(id);
+                deleteModel(id);
 
             }
         });
@@ -69,7 +69,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
         });*/
     }
     private void deleteModel(int id){
-        String URL=myURL+"/delete"+id;
+        String URL=myURL+"/delete/"+id;
         Toast.makeText(c,"id"+id,Toast.LENGTH_SHORT).show();
         RequestQueue queue = Volley.newRequestQueue(c);
         StringRequest stringRequest = new StringRequest(Request.Method.DELETE, URL, new Response.Listener<String>() {
