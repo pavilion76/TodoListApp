@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
+import org.json.*;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -43,6 +43,7 @@ import com.example.recyclerviewpractice.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 myAdapter = new MyAdapter(getApplicationContext(),models);
                 mRecyclerView.setAdapter(myAdapter);
                 String in =userInput.getText().toString();
-                submit(in);
+                submit();
             }
         });
         //get the data from the API and put it in the models array
@@ -141,49 +142,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //code to add a task to the database
-    //
-    private void submit(final String data) {
-        final String savedata= data;
+    //This works Don't touch
+    private void submit(){
+        final String myContent = userInput.getText().toString();
         String URL=myURL+"/task/add";
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, URL, convertStringToJsonObject(generateJSONString()), new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject objres=new JSONObject(response);
-                    Toast.makeText(getApplicationContext(),objres.toString(),Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    Toast.makeText(getApplicationContext(),"Server Error",Toast.LENGTH_LONG).show();
-                }
+            public void onResponse(JSONObject response) {
+                Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
             }
-        })
-        {
+        }){
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return savedata == null ? null : savedata.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) { return null; }
-            }
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String> ();
-                params.put("content", "test");
-                return params;
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                return headers;
             }
         };
-        queue.add(stringRequest);
-
+        queue.add(request);
     }
 
     private ArrayList<Model> parseJSONArrayToModels(JSONArray jsonArray){
@@ -205,6 +187,14 @@ public class MainActivity extends AppCompatActivity {
     }
     private String generateJSONString(){
         return "{"+"\"content\":"+"\""+userInput.getText()+"\","+"\"priority\":"+"\"3\"}";
+    }
+    private JSONObject convertStringToJsonObject(String in){
+        try{
+            return new JSONObject(in);
+        }catch (Throwable t){
+
+        }
+        return new JSONObject();
     }
     private ArrayList<Model> getMyList(){
         ArrayList<Model> models = new ArrayList<>();
