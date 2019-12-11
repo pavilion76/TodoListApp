@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    //get models from database
+    //This works don't touch
     private void getModels(){
         String URL=myURL+"/task";
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //code to add a task to the database
-    //THIS WORKS DON"T TOUCH
+    //
     private void submit(final String data) {
         final String savedata= data;
         String URL=myURL+"/task/add";
