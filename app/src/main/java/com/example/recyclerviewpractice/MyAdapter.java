@@ -12,37 +12,24 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.recyclerviewpractice.MyAdapter;
-import com.example.recyclerviewpractice.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
+    private static String myURL ="http://192.168.0.127:5000";
     Context c;
     ArrayList<Model> models;
-    private RequestQueue requestQueue;
-    private static String myURL ="http://192.168.0.127:5000";
 
     public MyAdapter(Context c, ArrayList<Model> models) {
         this.c = c;
@@ -66,25 +53,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
         holder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemClickListener(View v, int position) {
-                String gTitle = models.get(position).getTitle();
-                String gDesc = models.get(position).getDescription();       //get data from previous activity
-                BitmapDrawable bitmapDrawable= (BitmapDrawable)holder.mImageView.getDrawable(); //get image from drawable folder
-
-
-                Bitmap bitmap = bitmapDrawable.getBitmap();
-                ByteArrayOutputStream stream = new ByteArrayOutputStream(); //image will get put in this stream
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100,stream);
-                byte[] bytes = stream.toByteArray();
-
-                Intent intent = new Intent(c,AnotherActivity.class);
-                intent.putExtra("iTitle",gTitle);
-                intent.putExtra("iDesc",gDesc);
-                intent.putExtra("iImage",bytes);
-                c.startActivity(intent);
+                //delete from database via ID
+                int id=models.get(position).getId();
+                //deleteModel(id);
 
             }
         });
-
         /*holder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemClickListener(View v, int position) {
@@ -94,11 +68,29 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
             }
         });*/
     }
-    private void submit(String data) {
-        final String savedata = data;
-        String URL = myURL + "/delete/";
+    private void deleteModel(int id){
+        String URL=myURL+"/delete"+id;
+        Toast.makeText(c,"id"+id,Toast.LENGTH_SHORT).show();
+        RequestQueue queue = Volley.newRequestQueue(c);
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(c,response,Toast.LENGTH_LONG).show();
 
-
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(c, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        })
+        {
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+        };
+        queue.add(stringRequest);
     }
 
     @Override
